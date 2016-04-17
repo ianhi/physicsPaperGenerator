@@ -29,7 +29,7 @@ def eliminateBraces(f, l):
     abstract += l
     return abstract
 
-def getAbstracts(amt = None):
+def getAbstracts(amt = None,outputFile = False,debug=False):
     abstracts = []
     counter = 0
     for year in list(range(1992,2004)):
@@ -39,10 +39,8 @@ def getAbstracts(amt = None):
             files = files[:amt]
         for filename in files:
             f = open(os.path.join('KDD-Downloads/'+str(year)+'/',filename), "r")
-            # if counter%50==0:
-                # print(counter)
-            print(counter)
-            # print(filename)
+            if debug:
+                print(counter)
             abstract = ""
             try:
                 for line in f:
@@ -66,8 +64,8 @@ def getAbstracts(amt = None):
                 pass
             abstracts.append(abstract)
             counter += 1
-
-    f = open("abstracts.txt", "w")
-    for abstract in abstracts:
-        f.write(abstract)
+    if outputFile:
+        f = open("abstracts.txt", "w")
+        for abstract in abstracts:
+            f.write(abstract)
     return abstracts
