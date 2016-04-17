@@ -90,15 +90,20 @@ class markovChain(object):
 
     def normalize(self):
         print("NORMALIZING")
-        self.normed_db = deepcopy(self.db)
+        import time
+        millis = int(round(time.time() * 1000))
+
+        # self.normed_db = deepcopy(self.db) #good bit slower than _db_factory
+        self.normed_db  = _db_factory()
         for word in self.db:
             wordsum = 0
             for nextword in self.db[word]:
                 wordsum += self.db[word][nextword]
             if wordsum != 0:
                 for nextword in self.db[word]:
-                    self.normed_db[word][nextword] /= wordsum
+                    self.normed_db[word][nextword] = self.db[word][nextword]/wordsum
         self.normalized = True
+        print(int(round(time.time() * 1000)) - millis)
 
     def dumpdb(self):
         try:
