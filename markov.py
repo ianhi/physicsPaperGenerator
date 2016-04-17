@@ -41,7 +41,7 @@ def similar(a, b):
     return Levenshtein.ratio(a,b)
     #return SequenceMatcher(None, a, b).ratio()
 
-def abstracts(num=1000):
+def abstracts(num=None):
     ab = getAbstracts(num)
     print("Generating text")
     count=0
@@ -58,7 +58,7 @@ def abstracts(num=1000):
 # To let the markov chain generate some text, execute
 if(not os.path.exists("./middb")):
     print("makin abstracts")
-    abstracts(None)
+    abstracts()
     mc_mid.dumpdb()
     mc_first.dumpdb()
     mc_last.dumpdb()
@@ -73,11 +73,8 @@ seedStr = random.choice(sentences[0].split())
 for i in range(3):
     mid=""
     while not goodSentence(mid,sentences[-1]):
-        #print(sentences)
-        #print(sentences[len(sentences)-2])
         mid = mc_mid.generateStringWithSeed(seedStr)
         seedStr = random.choice([z for z in sentences[-1].split() if z not in stopwords])
-    #print("GOT HERE: "+mid)
     sentences.append(mid)
 
 sentences.append(mc_last.generateStringWithSeed(seedStr))
