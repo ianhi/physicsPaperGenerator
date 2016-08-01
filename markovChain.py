@@ -14,19 +14,25 @@ import re
 from collections import defaultdict
 from copy import deepcopy
 
+
 class StringContinuationImpossibleError(Exception):
     pass
 
 # {words: {word: prob}}
 # We have to define these as separate functions so they can be pickled.
+
+
 def _db_factory():
     return defaultdict(_one_dict)
+
 
 def _one():
     return 1.0
 
+
 def _one_dict():
     return defaultdict(_one)
+
 
 def _wordIter(text, separator='.'):
     """
@@ -46,27 +52,32 @@ def _wordIter(text, separator='.'):
         if sub:
             yield sub
 
+
 class markovChain(object):
+
     def __init__(self, dbFilePath=None):
         self.dbFilePath = dbFilePath
         self.normed_db = {}
         self.normalized = False
         if not dbFilePath:
-            self.dbFilePath = os.path.join(os.path.dirname(__file__), "markovdb")
+            self.dbFilePath = os.path.join(
+                os.path.dirname(__file__), "markovdb")
         try:
             with open(self.dbFilePath, 'rb') as dbfile:
                 self.db = pickle.load(dbfile)
         except (IOError, ValueError):
-            logging.warn('Database file corrupt or not found, using empty database')
+            logging.warn(
+                'Database file corrupt or not found, using empty database')
             self.db = _db_factory()
 
     def generateDatabase(self, textSample, sentenceSep='[.!?\n]', n=2):
         """ Generate word probability database from raw content string """
         # I'm using the database to temporarily store word counts
-        textSample = _wordIter(textSample, sentenceSep)  # get an iterator for the 'sentences'
+        # get an iterator for the 'sentences'
+        textSample = _wordIter(textSample, sentenceSep)
         # We're using '' as special symbol for the beginning
         # of a sentence
-        self.normalized=False
+        self.normalized = False
         self.db[('',)][''] = 0.0
         for line in textSample:
             words = line.strip().split()  # split words in line
@@ -75,7 +86,7 @@ class markovChain(object):
             # first word follows a sentence end
             self.db[("",)][words[0]] += 1
 
-            for order in range(1, n+1):
+            for order in range(1, n + 1):
                 for i in range(len(words) - 1):
                     if i + order >= len(words):
                         continue
@@ -94,14 +105,15 @@ class markovChain(object):
         millis = int(round(time.time() * 1000))
 
         # self.normed_db = deepcopy(self.db) #good bit slower than _db_factory
-        self.normed_db  = _db_factory()
+        self.normed_db = _db_factory()
         for word in self.db:
             wordsum = 0
             for nextword in self.db[word]:
                 wordsum += self.db[word][nextword]
             if wordsum != 0:
                 for nextword in self.db[word]:
-                    self.normed_db[word][nextword] = self.db[word][nextword]/wordsum
+                    self.normed_db[word][nextword] = self.db[
+                        word][nextword] / wordsum
         self.normalized = True
         print(int(round(time.time() * 1000)) - millis)
 
@@ -125,10 +137,10 @@ class markovChain(object):
         # but as the generated sentence only depends on the last word of the seed
         # I'm assuming seeds tend to be rather short.
 
-
         words = seed.split()
         if (words[-1],) not in self.db:
-            # The only possible way it won't work is if the last word is not known
+            # The only possible way it won't work is if the last word is not
+            # known
             raise StringContinuationImpossibleError('Could not continue string: '
                                                     + seed)
         return self._accumulateWithSeed(words)

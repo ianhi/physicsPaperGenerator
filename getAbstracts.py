@@ -1,4 +1,6 @@
 import os
+
+
 def eliminateBraces(f, l):
     abstract = ""
     numOpenedBrackets = 1
@@ -9,7 +11,8 @@ def eliminateBraces(f, l):
         l = l[1:]
     else:
         l = ""
-    while numOpenedBrackets and "\\end{abstract}" not in l: # this might return junk now.
+    # this might return junk now.
+    while numOpenedBrackets and "\\end{abstract}" not in l:
         openPos = float("inf")
         closedPos = float("inf")
         if "{" in l:
@@ -29,32 +32,34 @@ def eliminateBraces(f, l):
     abstract += l
     return abstract
 
-def getAbstracts(amt = None,outputFile = False,debug=False):
+
+def getAbstracts(amt=None, outputFile=False, debug=False):
     abstracts = []
     counter = 0
-    for year in list(range(1992,2004)):
+    for year in list(range(1992, 2004)):
         print(year)
-        files = os.listdir('KDD-Downloads/'+str(year)+'/')
+        files = os.listdir('KDD-Downloads/' + str(year) + '/')
         if amt:
             files = files[:amt]
         for filename in files:
-            f = open(os.path.join('KDD-Downloads/'+str(year)+'/',filename), "r")
+            f = open(os.path.join('KDD-Downloads/' +
+                                  str(year) + '/', filename), "r")
             if debug:
                 print(counter)
             abstract = ""
             try:
                 for line in f:
-                    if line[0]=='%':
+                    if line[0] == '%':
                         continue
                     if line.strip() == "\\begin{abstract}":
                         l = f.readline()
                         counts = 0
-                        while "\\end{abstract}" not in l :
-                            counts+=1
-                            if counts>100:
+                        while "\\end{abstract}" not in l:
+                            counts += 1
+                            if counts > 100:
                                 break
                             if "{" in l:
-                                l += eliminateBraces(f,l)
+                                l += eliminateBraces(f, l)
                             else:
                                 abstract += l
 
